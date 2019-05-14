@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -208,12 +210,30 @@ public class VideoController extends BasicController {
     }
 
     @PostMapping(value = "/showAll")
-    public IMoocJSONResult uploadCover(Integer page) throws Exception {
+    public IMoocJSONResult uploadCover(@RequestBody Videos video, Integer isSaveRecored, Integer page) throws Exception {
 
         if (page == null) {
             page = 1;
         }
-        PagedResult videos = videoService.getAllVideos(page, PAGE_SIZE);
-        return IMoocJSONResult.ok(videos);
+        PagedResult result = videoService.getAllVideos(video, isSaveRecored, page, PAGE_SIZE);
+        return IMoocJSONResult.ok(result);
+    }
+
+    @PostMapping(value = "/hot")
+    public IMoocJSONResult hot() throws Exception {
+        List <String> list = videoService.getHotWords();
+        return IMoocJSONResult.ok(list);
+    }
+
+    @PostMapping(value = "/userLike")
+    public IMoocJSONResult userLike(String userId, String videoId, String videoCreaterId) throws Exception {
+        videoService.userLikeVideo(userId, videoId, videoCreaterId);
+        return IMoocJSONResult.ok();
+    }
+
+    @PostMapping(value = "/userUnLike")
+    public IMoocJSONResult userUnLike(String userId, String videoId, String videoCreaterId) throws Exception {
+        videoService.userUnLikeVideo(userId, videoId, videoCreaterId);
+        return IMoocJSONResult.ok();
     }
 }

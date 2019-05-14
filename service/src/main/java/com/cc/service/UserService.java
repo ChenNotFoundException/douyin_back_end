@@ -17,4 +17,10 @@ public interface UserService {
     void updateUserInfo(Users users);
 
     Users queryUserInfo(String userId);
+
+    boolean isUserLikeVideo(String userId, String videoId);
+
+    void saveUserFanRelation(String userId, String fanId);
+
+    void deleteUserFanRelation(String userId, String fanId);
 }

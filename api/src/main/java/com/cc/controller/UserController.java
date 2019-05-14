@@ -2,6 +2,7 @@ package com.cc.controller;
 
 import com.cc.service.UserService;
 import com.imooc.pojo.Users;
+import com.imooc.pojo.vo.PublisherVO;
 import com.imooc.pojo.vo.UsersVO;
 import com.imooc.utils.IMoocJSONResult;
 import io.swagger.annotations.Api;
@@ -107,6 +108,47 @@ public class UserController extends BasicController {
         BeanUtils.copyProperties(userInfo, usersVO);
 
         return IMoocJSONResult.ok(usersVO);
+
+    }
+
+    @PostMapping("/queryPublisher")
+    public IMoocJSONResult queryPublisher(String LoginUserId, String VideoId, String PublisherUserId) throws Exception {
+        if (StringUtils.isBlank(PublisherUserId)) {
+            return IMoocJSONResult.errorMsg(" ");
+        }
+        Users userInfo = userService.queryUserInfo(PublisherUserId);
+        UsersVO publisher = new UsersVO();
+        BeanUtils.copyProperties(userInfo, publisher);
+
+        //查询点赞关联关系
+        boolean userLikeVideo = userService.isUserLikeVideo(LoginUserId, VideoId);
+        PublisherVO bean = new PublisherVO();
+        bean.setPubliser(publisher);
+        bean.setUserLikeVideo(userLikeVideo);
+
+        return IMoocJSONResult.ok(bean);
+
+    }
+
+    @PostMapping("/beyourfans")
+    public IMoocJSONResult beyourfans(String userId, String fanId) throws Exception {
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(fanId)) {
+            return IMoocJSONResult.errorMsg("");
+        }
+
+        userService.saveUserFanRelation(userId, fanId);
+        return IMoocJSONResult.ok("关注成功");
+        
+    }
+
+    @PostMapping("/dontbeyourfans")
+    public IMoocJSONResult dontbeyourfans(String userId, String fanId) throws Exception {
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(fanId)) {
+            return IMoocJSONResult.errorMsg("");
+        }
+
+        userService.deleteUserFanRelation(userId, fanId);
+        return IMoocJSONResult.ok("取消关注");
 
     }
 }
