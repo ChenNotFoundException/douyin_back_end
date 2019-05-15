@@ -30,6 +30,9 @@
   		<if test=" videoDesc != null and videoDesc != '' ">
   			and v.video_desc like '%${videoDesc}%'
   		</if>
+      <if test=" userId != null and userId != '' ">
+          and v.user_id = #{userId}
+      </if>
   		and v.status = 1
   	order by v.create_time desc
   

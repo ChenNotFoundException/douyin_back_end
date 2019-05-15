@@ -8,7 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface VideosMapperCustom extends MyMapper<Videos> {
-    List <VideosVO> queryAllVideos(@Param("videoDesc") String videoDesc);
+    List <VideosVO> queryAllVideos(@Param("videoDesc") String videoDesc,
+                                   @Param("userId") String userId);
 
     /**
      * 点赞
@@ -23,4 +24,8 @@ public interface VideosMapperCustom extends MyMapper<Videos> {
      * @param videoId
      */
     void reduceVideoLikeCount(String videoId);
+
+    List <VideosVO> queryMyFollowVideos(String userId);
+
+    List <VideosVO> queryMyLikeVideos(String userId);
 }

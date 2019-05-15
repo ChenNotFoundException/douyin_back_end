@@ -4,11 +4,14 @@ import com.cc.service.VideoService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.imooc.mapper.*;
+import com.imooc.pojo.Comments;
 import com.imooc.pojo.SearchRecords;
 import com.imooc.pojo.UsersLikeVideos;
 import com.imooc.pojo.Videos;
+import com.imooc.pojo.vo.CommentsVO;
 import com.imooc.pojo.vo.VideosVO;
 import com.imooc.utils.PagedResult;
+import com.imooc.utils.TimeAgoUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.entity.Example.Criteria;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +45,10 @@ public class VideoServiceImpl implements VideoService {
 
     @Autowired
     private UsersLikeVideosMapper usersLikeVideosMapper;
+    @Autowired
+    private CommentsMapper commentsMapper;
+    @Autowired
+    private CommentsMapperCustom commentMapperCustom;
 
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -79,6 +87,47 @@ public class VideoServiceImpl implements VideoService {
         usersMapper.reduceReceiveLikeCount(userId);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedResult queryMyFollowVideos(String userId, Integer page, int pageSize) {
+        PageHelper.startPage(page, pageSize);
+        List <VideosVO> list = videosMapperCustom.queryMyFollowVideos(userId);
+
+        PageInfo <VideosVO> pageList = new PageInfo <>(list);
+
+        PagedResult pagedResult = new PagedResult();
+        pagedResult.setTotal(pageList.getPages());
+        pagedResult.setRows(list);
+        pagedResult.setPage(page);
+        pagedResult.setRecords(pageList.getTotal());
+
+        return pagedResult;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void saveComment(Comments comment) {
+        comment.setId(sid.nextShort());
+        comment.setCreateTime(new Date());
+        commentsMapper.insert(comment);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedResult queryMyLikeVideos(String userId, Integer page, Integer pageSize) {
+        PageHelper.startPage(page, pageSize);
+        List <VideosVO> list = videosMapperCustom.queryMyLikeVideos(userId);
+
+        PageInfo <VideosVO> pageList = new PageInfo <>(list);
+
+        PagedResult pagedResult = new PagedResult();
+        pagedResult.setTotal(pageList.getPages());
+        pagedResult.setRows(list);
+        pagedResult.setPage(page);
+        pagedResult.setRecords(pageList.getTotal());
+
+        return pagedResult;
+    }
 
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -88,6 +137,30 @@ public class VideoServiceImpl implements VideoService {
         video.setId(id);
         videosMapper.insertSelective(video);
         return id;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedResult getAllComments(String videoId, Integer page, Integer pageSize) {
+
+        PageHelper.startPage(page, pageSize);
+
+        List <CommentsVO> list = commentMapperCustom.queryComments(videoId);
+
+        for (CommentsVO c : list) {
+            String timeAgo = TimeAgoUtils.format(c.getCreateTime());
+            c.setTimeAgoStr(timeAgo);
+        }
+
+        PageInfo <CommentsVO> pageList = new PageInfo <>(list);
+
+        PagedResult grid = new PagedResult();
+        grid.setTotal(pageList.getPages());
+        grid.setRows(list);
+        grid.setPage(page);
+        grid.setRecords(pageList.getTotal());
+
+        return grid;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -102,6 +175,7 @@ public class VideoServiceImpl implements VideoService {
     public PagedResult getAllVideos(Videos video, Integer isSaveRecored, Integer page, Integer pageSize) {
 //保存热搜词
         String desc = video.getVideoDesc();
+        String userId = video.getUserId();
         if (isSaveRecored != null && isSaveRecored == 1) {
             SearchRecords record = new SearchRecords();
             record.setId(sid.nextShort());
@@ -110,7 +184,7 @@ public class VideoServiceImpl implements VideoService {
         }
 
         PageHelper.startPage(page, pageSize);
-        List <VideosVO> list = videosMapperCustom.queryAllVideos(desc);
+        List <VideosVO> list = videosMapperCustom.queryAllVideos(desc, userId);
 
         PageInfo <VideosVO> pagelist = new PageInfo <>(list);
 

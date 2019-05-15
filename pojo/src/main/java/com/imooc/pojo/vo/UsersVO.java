@@ -9,6 +9,17 @@ import javax.persistence.Id;
 
 @ApiModel(value = "用户对象", description = "this is用户对象")
 public class UsersVO {
+
+    private boolean isFollow;
+
+    public boolean isFollow() {
+        return isFollow;
+    }
+
+    public void setFollow(boolean follow) {
+        isFollow = follow;
+    }
+
     @ApiModelProperty(hidden = true)
     @Id
     private String id;

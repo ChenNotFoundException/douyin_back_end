@@ -2,6 +2,7 @@ package com.cc.controller;
 
 import com.cc.service.UserService;
 import com.imooc.pojo.Users;
+import com.imooc.pojo.UsersReport;
 import com.imooc.pojo.vo.PublisherVO;
 import com.imooc.pojo.vo.UsersVO;
 import com.imooc.utils.IMoocJSONResult;
@@ -12,10 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -99,13 +97,14 @@ public class UserController extends BasicController {
     @ApiOperation(value = "用户信息查询", notes = "用户信息查询")
     @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataType = "String", paramType = "query")
     @PostMapping("/query")
-    public IMoocJSONResult query(String userId) throws Exception {
+    public IMoocJSONResult query(String userId, String fanId) throws Exception {
         if (StringUtils.isBlank(userId)) {
             return IMoocJSONResult.errorMsg("用户ID不能为空。。");
         }
         Users userInfo = userService.queryUserInfo(userId);
         UsersVO usersVO = new UsersVO();
         BeanUtils.copyProperties(userInfo, usersVO);
+        usersVO.setFollow(userService.queryIfFollow(userId, fanId));
 
         return IMoocJSONResult.ok(usersVO);
 
@@ -138,7 +137,7 @@ public class UserController extends BasicController {
 
         userService.saveUserFanRelation(userId, fanId);
         return IMoocJSONResult.ok("关注成功");
-        
+
     }
 
     @PostMapping("/dontbeyourfans")
@@ -151,4 +150,14 @@ public class UserController extends BasicController {
         return IMoocJSONResult.ok("取消关注");
 
     }
+
+    @PostMapping("/reportUser")
+    public IMoocJSONResult reportUser(@RequestBody UsersReport usersReport) throws Exception {
+        userService.reportUser(usersReport);
+
+        return IMoocJSONResult.ok("举报成功...世界有你更美好");
+
+
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.cc.service;
 
 import com.imooc.pojo.Users;
+import com.imooc.pojo.UsersReport;
 
 /**
  * @author chenchen
@@ -23,4 +24,8 @@ public interface UserService {
     void saveUserFanRelation(String userId, String fanId);
 
     void deleteUserFanRelation(String userId, String fanId);
+
+    boolean queryIfFollow(String userId, String fanId);
+
+    void reportUser(UsersReport usersReport);
 }

@@ -1,5 +1,6 @@
 package com.cc.service;
 
+import com.imooc.pojo.Comments;
 import com.imooc.pojo.Videos;
 import com.imooc.utils.PagedResult;
 
@@ -11,6 +12,9 @@ import java.util.List;
  * @Content:
  */
 public interface VideoService {
+
+    PagedResult queryMyLikeVideos(String userId, Integer page, Integer pageSize);
+
     String saveVidoe(Videos video);
 
     void updateVideo(String videoId, String uploadPathDB);
@@ -25,4 +29,10 @@ public interface VideoService {
 
     //取消点赞
     void userUnLikeVideo(String userId, String videoId, String videoCreaterId);
+
+    PagedResult queryMyFollowVideos(String userId, Integer page, int pageSize);
+
+    void saveComment(Comments comment);
+
+    PagedResult getAllComments(String videoId, Integer page, Integer pageSize);
 }

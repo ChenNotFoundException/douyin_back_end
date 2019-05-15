@@ -18,7 +18,7 @@ public class BasicController {
     //文件保存的命名空间
     public static final String FILE_SPACE = "E:\\imooc";
 
-    public static final  String ffmpegEXE = "D:\\ffmpeg\\bin\\ffmpeg.exe";
+    public static final String ffmpegEXE = "D:\\ffmpeg\\bin\\ffmpeg.exe";
     public static final  Integer PAGE_SIZE = 5;
 
 

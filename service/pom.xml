@@ -13,7 +13,7 @@
 <dependencies>
     <dependency>
         <groupId>com.cc</groupId>
-        <artifactId>dao</artifactId>
+        <artifactId>mapper</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
